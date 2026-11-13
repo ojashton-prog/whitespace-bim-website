@@ -42,7 +42,7 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 @media (max-width:700px){header .brand{transform:scale(.9);margin:-2px 0}}
 @media (max-width:400px){header .brand{transform:scale(.78);margin:-4px -20px}}
 /* Phones: the logo, headline and model fill the first screen; SERVICES starts below it. */
-@media (max-width:700px){.first-screen{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}.first-screen figure{margin-top:auto!important;margin-bottom:auto!important}}
+@media (max-width:700px){.first-screen{min-height:calc(100vh - 56px);min-height:calc(100svh - 56px);display:flex;flex-direction:column}#top h1,#top p{top:-37px!important}.first-screen figure{margin-top:auto!important;margin-bottom:auto!important}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fnav{transition:none}}
 </style>
 <script src="assets/js/float-nav.js" defer></script>
