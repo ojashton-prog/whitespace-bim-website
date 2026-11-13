@@ -54,6 +54,13 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 .label{position:relative;gap:0!important;padding-left:0.14em}
 .label>span[aria-hidden="true"]{position:absolute;top:50%;transform:translateY(-50%);right:calc(100% - 0.14em + 10px)}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fnav{transition:none}}
+@media (max-width:700px){
+/* Phones: the pill hides everything that scrolls up above it, so it appears to cut the page off.
+   The white band is part of the pill, so it slides and fades with it. */
+.fnav{background:transparent!important;border-color:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.fnav::before{content:"";position:absolute;left:-13px;right:-13px;top:-240px;bottom:50%;background:#FFFFFF;z-index:-2;pointer-events:none}
+.fnav::after{content:"";position:absolute;inset:-1px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #E5E7EB;box-shadow:0 6px 24px rgba(17,24,39,.08);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);z-index:-1;pointer-events:none}
+}
 </style>
 <script src="assets/js/float-nav.js?v=9" defer></script>
 </head>
