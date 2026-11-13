@@ -17,7 +17,7 @@
   var anchorY = null;       // scroll position where the jump landed
   var settleTimer;
 
-  function pastHeader() { return header.getBoundingClientRect().bottom < 0; }
+  function pastHeader() { return nav.getBoundingClientRect().bottom < 0; }
   function setShown(on) { fnav.classList.toggle('show', on); }
 
   function update() {
