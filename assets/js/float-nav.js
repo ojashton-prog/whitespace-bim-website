@@ -92,25 +92,40 @@
     return true;
   }
 
-  // Our own smooth scroll (the same on every phone and browser; some phones skip the
-  // browser's own when animations are turned down). Eases in and out; a reduced-motion
-  // setting makes it shorter, not instant. A touch or the wheel stops it.
+  // Our own smooth scroll, the same on every phone and browser (some phones skip the
+  // browser's own when animations are turned down): it gathers speed, coasts a little past
+  // the section and settles back onto it. A touch or the wheel stops it.
   var glide = null;
   function stopGlide() { if (glide) { cancelAnimationFrame(glide); glide = null; } }
   function glideTo(y) {
     stopGlide();
     var from = window.scrollY, dist = y - from;
     if (Math.abs(dist) < 2) { window.scrollTo(0, y); return; }
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var ms = reduce ? 260 : Math.min(900, 380 + Math.abs(dist) * 0.12);
+    var reduce = false; // (the same glide everywhere, as asked; a phone's reduced-motion setting no longer skips it)
+    // With inertia: picks up speed, coasts a little past the section (up to 70 px), settles
+    // back onto it. Reduced motion: a short plain glide.
+    var dir = dist > 0 ? 1 : -1;
+    var over = reduce ? 0 : dir * Math.min(70, Math.max(18, Math.abs(dist) * 0.035));
+    var ms1 = reduce ? 260 : Math.min(1500, 650 + Math.abs(dist) * 0.25);
+    var ms2 = reduce ? 0 : 480;
+    var peak = from + dist + over;
     var t0 = null;
     document.documentElement.style.scrollBehavior = 'auto';
     function step(t) {
       if (t0 === null) t0 = t;
-      var k = Math.min(1, (t - t0) / ms);
-      var e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-      window.scrollTo(0, from + dist * e);
-      if (k < 1) glide = requestAnimationFrame(step);
+      var el = t - t0, pos, done = false;
+      if (el < ms1) {
+        var k = el / ms1;
+        // Ease in (gathering speed), then a long soft deceleration into the overshoot.
+        // (k^2 to 35 %, then 1 - B (1-k)^2.4: position and speed continuous; speed 0 at the peak)
+        var e = k < 0.35 ? 3.2043 * k * k : 1 - 1.7083 * Math.pow(1 - k, 2.4);
+        pos = from + (peak - from) * e;
+      } else if (el < ms1 + ms2) {
+        var b = (el - ms1) / ms2;
+        pos = peak + (from + dist - peak) * (0.5 - Math.cos(Math.PI * b) / 2);
+      } else { pos = from + dist; done = true; }
+      window.scrollTo(0, pos);
+      if (!done) glide = requestAnimationFrame(step);
       else { glide = null; document.documentElement.style.scrollBehavior = ''; }
     }
     glide = requestAnimationFrame(step);
