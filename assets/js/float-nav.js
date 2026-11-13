@@ -79,7 +79,7 @@
   }
 
   // Land every section with its small label the same distance from the top of the screen.
-  var OFFSET = 56;
+  var OFFSET = 23; // (the label this far from the top: 59 % closer than the 56 it was)
   function labelOf(section) {
     var bar = section.querySelector('span > span[aria-hidden="true"]');
     return bar ? bar.parentElement : section;
@@ -158,12 +158,14 @@
       if (gap < need) next.style.paddingTop = (base[IDS[i]] + need - gap) + 'px';
     }
     // Make sure the page is long enough for the last section to reach the same spot.
+    // (The room goes below the footer, so the logo keeps its place under the form.)
     var last = document.getElementById(IDS[IDS.length - 1]);
-    if (last) {
-      last.style.paddingBottom = '';
+    var foot = document.querySelector('footer');
+    if (last && foot) {
+      foot.style.marginBottom = '';
       var target = labelOf(last).getBoundingClientRect().top + window.scrollY - OFFSET;
       var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (target > maxScroll) last.style.paddingBottom = (target - maxScroll + 2) + 'px';
+      if (target > maxScroll) foot.style.marginBottom = (target - maxScroll + 2) + 'px';
     }
   }
   fitSections(true);
