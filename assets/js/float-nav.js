@@ -18,25 +18,39 @@
   var settleTimer;
 
   function pastHeader() { return nav.getBoundingClientRect().bottom < 0; }
-  // Shown: slides in. Hidden: fades out in place. Auto-hides 2s after scrolling stops,
-  // unless the pointer or keyboard focus is on it.
-  var HIDE_AFTER = 2000;
-  var hideTimer, hovering = false;
+  // Shown: slides in. Auto-hide (after letting go / scrolling stops): fades out in place.
+  // Back at the top of the page: slides out. Stays while a finger is on the screen,
+  // the pointer is over it, or a link in it has keyboard focus.
+  var HIDE_AFTER = 1500;
+  var hideTimer, hovering = false, touching = false;
+  function isShown() { return fnav.classList.contains('show'); }
   function armHide() {
     clearTimeout(hideTimer);
+    if (touching) return;
     hideTimer = setTimeout(function () {
-      if (hovering || fnav.contains(document.activeElement)) { armHide(); return; }
+      if (touching || hovering || fnav.contains(document.activeElement)) { armHide(); return; }
       setShown(false);
       anchorY = window.scrollY;   // scroll a little again to bring it back
     }, HIDE_AFTER);
   }
-  function setShown(on) {
+  function setShown(on, slideOut) {
+    fnav.classList.toggle('slideout', !on && !!slideOut);
     fnav.classList.toggle('show', on);
     if (on) armHide(); else clearTimeout(hideTimer);
   }
   fnav.addEventListener('mouseenter', function () { hovering = true; clearTimeout(hideTimer); });
-  fnav.addEventListener('mouseleave', function () { hovering = false; if (fnav.classList.contains('show')) armHide(); });
-  fnav.addEventListener('focusout', function () { if (fnav.classList.contains('show')) armHide(); });
+  fnav.addEventListener('mouseleave', function () { hovering = false; if (isShown()) armHide(); });
+  fnav.addEventListener('focusout', function () { if (isShown()) armHide(); });
+
+  // Holding the screen brings the pill in; letting go starts the fade timer.
+  window.addEventListener('touchstart', function (e) {
+    touching = true;
+    if (jumping || fnav.contains(e.target)) { clearTimeout(hideTimer); return; }
+    if (pastHeader()) { anchorY = null; setShown(true); }
+  }, { passive: true });
+  function release() { touching = false; if (isShown()) armHide(); }
+  window.addEventListener('touchend', release, { passive: true });
+  window.addEventListener('touchcancel', release, { passive: true });
 
   function update() {
     if (jumping) {
@@ -44,7 +58,8 @@
       settleTimer = setTimeout(function () { jumping = false; anchorY = window.scrollY; }, 180);
       return;
     }
-    if (!pastHeader()) { anchorY = null; setShown(false); return; }
+    if (!pastHeader()) { anchorY = null; if (isShown()) setShown(false, true); return; }
+    if (isShown()) { armHide(); return; }
     if (anchorY !== null && Math.abs(window.scrollY - anchorY) < REVEAL) return;
     anchorY = null;
     setShown(true);
