@@ -94,7 +94,7 @@
 
   // Our own smooth scroll, the same on every phone and browser (some phones skip the
   // browser's own when animations are turned down): it gathers speed, coasts a little past
-  // the section and settles back onto it. A touch or the wheel stops it.
+  // the section (up to 35 px) and settles back onto it. A touch or the wheel stops it.
   var glide = null;
   function stopGlide() { if (glide) { cancelAnimationFrame(glide); glide = null; } }
   function glideTo(y) {
@@ -102,10 +102,10 @@
     var from = window.scrollY, dist = y - from;
     if (Math.abs(dist) < 2) { window.scrollTo(0, y); return; }
     var reduce = false; // (the same glide everywhere, as asked; a phone's reduced-motion setting no longer skips it)
-    // With inertia: picks up speed, coasts a little past the section (up to 70 px), settles
+    // With inertia: speeds up to the middle of the move and slows again, a little past the section (up to 35 px), settles
     // back onto it. Reduced motion: a short plain glide.
     var dir = dist > 0 ? 1 : -1;
-    var over = reduce ? 0 : dir * Math.min(70, Math.max(18, Math.abs(dist) * 0.035));
+    var over = reduce ? 0 : dir * Math.min(35, Math.max(9, Math.abs(dist) * 0.0175));
     var ms1 = reduce ? 260 : Math.min(1500, 650 + Math.abs(dist) * 0.25);
     var ms2 = reduce ? 0 : 480;
     var peak = from + dist + over;
@@ -117,8 +117,8 @@
       if (el < ms1) {
         var k = el / ms1;
         // Ease in (gathering speed), then a long soft deceleration into the overshoot.
-        // (k^2 to 35 %, then 1 - B (1-k)^2.4: position and speed continuous; speed 0 at the peak)
-        var e = k < 0.35 ? 3.2043 * k * k : 1 - 1.7083 * Math.pow(1 - k, 2.4);
+        // Ramps up and down evenly: the fastest in the middle of the move, still at both ends.
+        var e = 0.5 - Math.cos(Math.PI * k) / 2;
         pos = from + (peak - from) * e;
       } else if (el < ms1 + ms2) {
         var b = (el - ms1) / ms2;
