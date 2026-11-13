@@ -18,18 +18,17 @@
   var settleTimer;
 
   function pastHeader() { return nav.getBoundingClientRect().bottom < 0; }
-  // Shown: slides in. Auto-hide (after letting go / scrolling stops): fades out in place.
-  // Back at the top of the page: slides out. Stays while a finger is on the screen,
-  // the pointer is over it, or a link in it has keyboard focus.
+  // Shown: slides in. Hides 1.5s after the last scroll or touch: slides out if a finger
+  // is still on the screen, fades out in place if not. Back at the top of the page it
+  // slides out. Stays while the mouse is over it or a link in it has keyboard focus.
   var HIDE_AFTER = 1500;
   var hideTimer, hovering = false, touching = false;
   function isShown() { return fnav.classList.contains('show'); }
   function armHide() {
     clearTimeout(hideTimer);
-    if (touching) return;
     hideTimer = setTimeout(function () {
-      if (touching || hovering || fnav.contains(document.activeElement)) { armHide(); return; }
-      setShown(false);
+      if (hovering || fnav.contains(document.activeElement)) { armHide(); return; }
+      setShown(false, touching);
       anchorY = window.scrollY;   // scroll a little again to bring it back
     }, HIDE_AFTER);
   }
@@ -38,14 +37,14 @@
     fnav.classList.toggle('show', on);
     if (on) armHide(); else clearTimeout(hideTimer);
   }
-  fnav.addEventListener('mouseenter', function () { hovering = true; clearTimeout(hideTimer); });
-  fnav.addEventListener('mouseleave', function () { hovering = false; if (isShown()) armHide(); });
+  fnav.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'mouse') return; hovering = true; clearTimeout(hideTimer); });
+  fnav.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'mouse') return; hovering = false; if (isShown()) armHide(); });
   fnav.addEventListener('focusout', function () { if (isShown()) armHide(); });
 
-  // Holding the screen brings the pill in; letting go starts the fade timer.
+  // Touching the screen brings the pill in.
   window.addEventListener('touchstart', function (e) {
     touching = true;
-    if (jumping || fnav.contains(e.target)) { clearTimeout(hideTimer); return; }
+    if (jumping || fnav.contains(e.target)) return;
     if (pastHeader()) { anchorY = null; setShown(true); }
   }, { passive: true });
   function release() { touching = false; if (isShown()) armHide(); }
