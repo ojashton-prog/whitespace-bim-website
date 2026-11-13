@@ -87,11 +87,36 @@
   function scrollToSection(id, smooth) {
     var section = document.getElementById(id);
     if (!section) return false;
-    var y = labelOf(section).getBoundingClientRect().top + window.scrollY - OFFSET;
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    var y = Math.max(0, labelOf(section).getBoundingClientRect().top + window.scrollY - OFFSET);
+    if (smooth) glideTo(y); else window.scrollTo(0, y);
     return true;
   }
+
+  // Our own smooth scroll (the same on every phone and browser; some phones skip the
+  // browser's own when animations are turned down). Eases in and out; a reduced-motion
+  // setting makes it shorter, not instant. A touch or the wheel stops it.
+  var glide = null;
+  function stopGlide() { if (glide) { cancelAnimationFrame(glide); glide = null; } }
+  function glideTo(y) {
+    stopGlide();
+    var from = window.scrollY, dist = y - from;
+    if (Math.abs(dist) < 2) { window.scrollTo(0, y); return; }
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var ms = reduce ? 260 : Math.min(900, 380 + Math.abs(dist) * 0.12);
+    var t0 = null;
+    document.documentElement.style.scrollBehavior = 'auto';
+    function step(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / ms);
+      var e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      window.scrollTo(0, from + dist * e);
+      if (k < 1) glide = requestAnimationFrame(step);
+      else { glide = null; document.documentElement.style.scrollBehavior = ''; }
+    }
+    glide = requestAnimationFrame(step);
+  }
+  window.addEventListener('wheel', stopGlide, { passive: true });
+  window.addEventListener('touchstart', stopGlide, { passive: true });
 
   // Space the sections so that, once a section is landed on, the next one starts
   // below the bottom of the screen. Extra room is added above the next section's title.
