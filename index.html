@@ -27,7 +27,7 @@ html{scroll-behavior:smooth}
 body{margin:0;background:#FFFFFF}
 img{max-width:100%}
 a{color:#111827}a:hover{color:#6B7280}
-@media (max-width:700px){h1{font-size:48px!important}header{padding:20px 16px!important}header nav{flex-wrap:nowrap!important;gap:16px!important;font-size:14px!important}header nav a{gap:6px!important;white-space:nowrap}}
+@media (max-width:700px){h1{font-size:clamp(40px,14.5vw,60px)!important}#top{padding-left:16px!important;padding-right:16px!important}header{padding:20px 16px!important}header nav{flex-wrap:nowrap!important;gap:16px!important;font-size:14px!important}header nav a{gap:6px!important;white-space:nowrap}}
 html{scroll-behavior:smooth}
 .fnav{line-height:normal;font-family:'Inter',system-ui,sans-serif;color:#111827;position:fixed;top:16px;right:16px;z-index:50;display:flex;align-items:center;gap:24px;padding:10px 20px;font-size:15px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid #E5E7EB;border-radius:999px;box-shadow:0 6px 24px rgba(17,24,39,.08);transform:translateY(calc(-100% - 24px));opacity:0;pointer-events:none;transition:opacity .48s ease,transform 0s linear .48s}
 .fnav.show{transform:none;opacity:1;pointer-events:auto;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .24s ease}
@@ -40,6 +40,9 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 #contact{min-height:100vh;min-height:100svh;box-sizing:border-box}
 #pipework{overflow-x:clip}
 @media (max-width:700px){header .brand{transform:scale(.9);margin:-2px 0}}
+@media (max-width:400px){header .brand{transform:scale(.78);margin:-4px -20px}}
+/* Phones: the logo, headline and model fill the first screen; SERVICES starts below it. */
+@media (max-width:700px){.first-screen{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}.first-screen figure{margin-top:auto!important;margin-bottom:auto!important}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fnav{transition:none}}
 </style>
 <script src="assets/js/float-nav.js" defer></script>
@@ -47,6 +50,7 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 <body>
 <div style="font-family: 'Inter', system-ui, sans-serif; color: #111827; background: #FFFFFF; position: relative">
 
+<div class="first-screen">
 <header style="max-width: none; margin: 0 auto; padding: 15.5px 37px 40.5px; display: flex; flex-wrap: wrap; gap: 16px 40px; align-items: center; justify-content: center">
 <a href="#top" class="brand" style="text-decoration: none; display: flex; align-items: center; gap: 14.4px" aria-label="Whitespace BIM home">
 <span style="display: flex; gap: 3.6px; position: relative; top: 1.6px" aria-hidden="true">
@@ -74,6 +78,7 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 <figure style="position: relative; top: -62px; max-width: 1024px; margin: 48px auto 0; padding: 0 16px">
 <img src="assets/images/hero-federated-model.webp" alt="Coordinated services model across a floor plate" style="display: block; width: 100%; height: auto; max-width: 100%">
 </figure>
+</div>
 
 <section id="rule" style="max-width: 1280px; margin: 0 auto; padding: 32px 32px 0; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 48px 96px">
 
