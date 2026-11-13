@@ -1,6 +1,6 @@
 # Whitespace BIM website
 
-Home page for Whitespace BIM: BIM modelling and coordination for building services.
+Home page for Whitespace BIM: BIM Development Consultants.
 
 ## Structure
 
