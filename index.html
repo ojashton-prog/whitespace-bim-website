@@ -23,8 +23,9 @@ html{scroll-behavior:smooth}
 .fnav a span{width:4px;height:15px;border-radius:2px}
 @media (max-width:700px){.fnav{left:12px;right:12px;top:12px;justify-content:center;gap:16px;padding:10px 14px;font-size:14px}.fnav a{gap:6px!important}}
 header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:24px!important;padding:10px 20px;border:1px solid transparent;font-size:15px!important;line-height:normal}
-@media (max-width:700px){header nav{left:12px;right:12px;top:12px;justify-content:center;gap:16px!important;padding:10px 14px;font-size:14px!important}header{padding-top:72px!important}}
+@media (max-width:700px){header nav{position:static;width:100%;box-sizing:border-box;justify-content:center;gap:16px!important;padding:10px 0;border:0;font-size:14px!important}}
 #contact{min-height:100vh;min-height:100svh;box-sizing:border-box}
+#pipework{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fnav{transition:none}}
 </style>
 <script src="assets/js/float-nav.js" defer></script>

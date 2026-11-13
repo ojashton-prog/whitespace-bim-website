@@ -47,6 +47,42 @@
     return true;
   }
 
+  // Space the sections so that, once a section is landed on, the next one starts
+  // below the bottom of the screen. Extra room is added above the next section's title.
+  var IDS = ['services', 'work', 'about', 'contact'];
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;top:0;left:0;width:0;visibility:hidden;pointer-events:none;height:100vh;height:100lvh';
+  document.body.appendChild(probe);
+  var base = {};
+  IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) base[id] = parseFloat(getComputedStyle(el).paddingTop) || 0;
+  });
+  var lastW = 0, lastH = 0;
+  function fitSections(force) {
+    var vh = probe.offsetHeight || window.innerHeight;
+    if (!force && window.innerWidth === lastW && Math.abs(vh - lastH) < 2) return;
+    lastW = window.innerWidth; lastH = vh;
+    IDS.forEach(function (id) { var el = document.getElementById(id); if (el) el.style.paddingTop = base[id] + 'px'; });
+    for (var i = 1; i < IDS.length; i++) {
+      var prev = document.getElementById(IDS[i - 1]), next = document.getElementById(IDS[i]);
+      if (!prev || !next) continue;
+      var gap = labelOf(next).getBoundingClientRect().top - labelOf(prev).getBoundingClientRect().top;
+      var need = vh - OFFSET + 24;
+      if (gap < need) next.style.paddingTop = (base[IDS[i]] + need - gap) + 'px';
+    }
+    // Make sure the page is long enough for the last section to reach the same spot.
+    var last = document.getElementById(IDS[IDS.length - 1]);
+    if (last) {
+      last.style.paddingBottom = '';
+      var target = labelOf(last).getBoundingClientRect().top + window.scrollY - OFFSET;
+      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (target > maxScroll) last.style.paddingBottom = (target - maxScroll + 2) + 'px';
+    }
+  }
+  fitSections(true);
+  window.addEventListener('resize', function () { fitSections(false); });
+
   function onLink(e) {
     var a = e.target.closest('a[href^="#"]');
     if (!a) return;
@@ -68,6 +104,7 @@
   fnav.addEventListener('click', onLink);
   window.addEventListener('scroll', update, { passive: true });
   window.addEventListener('load', function () {
+    fitSections(true);
     var id = location.hash.slice(1);
     if (id && id !== 'top') scrollToSection(id, false);
   });
