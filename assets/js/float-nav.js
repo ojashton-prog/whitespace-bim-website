@@ -32,9 +32,30 @@
     setShown(true);
   }
 
+  // Land every section with its small label the same distance from the top of the screen.
+  var OFFSET = 56;
+  function labelOf(section) {
+    var bar = section.querySelector('span > span[aria-hidden="true"]');
+    return bar ? bar.parentElement : section;
+  }
+  function scrollToSection(id, smooth) {
+    var section = document.getElementById(id);
+    if (!section) return false;
+    var y = labelOf(section).getBoundingClientRect().top + window.scrollY - OFFSET;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    return true;
+  }
+
   function onLink(e) {
     var a = e.target.closest('a[href^="#"]');
     if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    if (id !== 'top' && document.getElementById(id)) {
+      e.preventDefault();
+      history.replaceState(null, '', '#' + id);
+      scrollToSection(id, true);
+    }
     setShown(false);
     jumping = true;
     anchorY = null;
@@ -46,5 +67,9 @@
   nav.addEventListener('click', onLink);
   fnav.addEventListener('click', onLink);
   window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('load', function () {
+    var id = location.hash.slice(1);
+    if (id && id !== 'top') scrollToSection(id, false);
+  });
   update();
 })();
