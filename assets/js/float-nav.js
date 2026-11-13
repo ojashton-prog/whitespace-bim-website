@@ -44,6 +44,7 @@
   // Touching the screen brings the pill in.
   window.addEventListener('touchstart', function (e) {
     touching = true;
+    dirAcc = 0; lastY = window.scrollY;
     if (jumping || fnav.contains(e.target)) return;
     if (pastHeader()) { anchorY = null; setShown(true); }
   }, { passive: true });
@@ -51,6 +52,7 @@
   window.addEventListener('touchend', release, { passive: true });
   window.addEventListener('touchcancel', release, { passive: true });
 
+  var lastY = window.scrollY, dirAcc = 0, DIR_STEP = 12;
   function update() {
     if (jumping) {
       clearTimeout(settleTimer);
@@ -58,6 +60,18 @@
       return;
     }
     if (!pastHeader()) { anchorY = null; if (isShown()) setShown(false, true); return; }
+    // Finger on the screen: follow the direction of travel. Moving back up the page
+    // slides it in, moving down the page slides it out.
+    var y = window.scrollY, dy = y - lastY;
+    lastY = y;
+    if (touching) {
+      if ((dy > 0 && dirAcc < 0) || (dy < 0 && dirAcc > 0)) dirAcc = 0;
+      dirAcc += dy;
+      if (dirAcc > DIR_STEP && isShown()) { setShown(false, true); anchorY = null; }
+      else if (dirAcc < -DIR_STEP && !isShown()) { anchorY = null; setShown(true); }
+      else if (isShown()) armHide();
+      return;
+    }
     if (isShown()) { armHide(); return; }
     if (anchorY !== null && Math.abs(window.scrollY - anchorY) < REVEAL) return;
     anchorY = null;
