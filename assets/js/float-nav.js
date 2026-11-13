@@ -60,15 +60,15 @@
       return;
     }
     if (!pastHeader()) { anchorY = null; if (isShown()) setShown(false, true); return; }
-    // Finger on the screen: follow the direction of travel. Moving back up the page
-    // slides it in, moving down the page slides it out.
+    // Finger on the screen: follow the direction of travel. Moving down the page
+    // slides it in, moving back up the page slides it out.
     var y = window.scrollY, dy = y - lastY;
     lastY = y;
     if (touching) {
       if ((dy > 0 && dirAcc < 0) || (dy < 0 && dirAcc > 0)) dirAcc = 0;
       dirAcc += dy;
-      if (dirAcc > DIR_STEP && isShown()) { setShown(false, true); anchorY = null; }
-      else if (dirAcc < -DIR_STEP && !isShown()) { anchorY = null; setShown(true); }
+      if (dirAcc < -DIR_STEP && isShown()) { setShown(false, true); anchorY = null; }
+      else if (dirAcc > DIR_STEP && !isShown()) { anchorY = null; setShown(true); }
       else if (isShown()) armHide();
       return;
     }
