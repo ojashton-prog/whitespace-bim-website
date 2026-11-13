@@ -31,6 +31,7 @@ a{color:#111827}a:hover{color:#6B7280}
 html{scroll-behavior:smooth}
 .fnav{line-height:normal;font-family:'Inter',system-ui,sans-serif;color:#111827;position:fixed;top:16px;right:16px;z-index:50;display:flex;align-items:center;gap:24px;padding:10px 20px;font-size:15px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid #E5E7EB;border-radius:999px;box-shadow:0 6px 24px rgba(17,24,39,.08);transform:translateY(calc(-100% - 24px));opacity:0;pointer-events:none;transition:opacity .48s ease,transform 0s linear .48s}
 .fnav.show{transform:none;opacity:1;pointer-events:auto;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .24s ease}
+.fnav.instant{transition:none!important}
 .fnav.slideout{transition:transform .42s cubic-bezier(.4,0,.6,1),opacity .42s ease}
 .fnav a{text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;white-space:nowrap}
 .fnav a span{width:4px;height:15px;border-radius:2px}
@@ -50,7 +51,7 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 @media (max-width:700px){header .brand{font-size:min(calc((100vw - 34px) / 10.22),51.5px);gap:.4286em!important}header .brand>span:first-child{gap:.107em!important;top:.0476em!important}header .brand>span:first-child>span{width:.1786em!important;height:.714em!important;border-radius:.0714em!important}header .brand>span:nth-child(2){font-size:1em!important}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fnav{transition:none}}
 </style>
-<script src="assets/js/float-nav.js?v=7" defer></script>
+<script src="assets/js/float-nav.js?v=8" defer></script>
 </head>
 <body>
 <div style="font-family: 'Inter', system-ui, sans-serif; color: #111827; background: #FFFFFF; position: relative">

@@ -128,7 +128,7 @@
       } else { pos = from + dist; done = true; }
       window.scrollTo(0, pos);
       if (!done) glide = requestAnimationFrame(step);
-      else { glide = null; document.documentElement.style.scrollBehavior = ''; }
+      else { glide = null; document.documentElement.style.scrollBehavior = ''; clearTimeout(settleTimer); settleTimer = setTimeout(function () { jumping = false; anchorY = window.scrollY; }, 250); }
     }
     glide = requestAnimationFrame(step);
   }
@@ -182,11 +182,16 @@
       history.replaceState(null, '', '#' + id);
       scrollToSection(id, true);
     }
+    // The pill goes at once (no fade lingering over the section being landed on), and stays
+    // away until the glide has finished and the page is scrolled again.
+    fnav.classList.add('instant');
     setShown(false);
+    void fnav.offsetWidth;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { fnav.classList.remove('instant'); }); });
     jumping = true;
     anchorY = null;
     clearTimeout(settleTimer);
-    settleTimer = setTimeout(function () { jumping = false; anchorY = window.scrollY; }, 900);
+    settleTimer = setTimeout(function () { if (!glide) { jumping = false; anchorY = window.scrollY; } }, 900);
     if (a.parentNode === fnav) a.blur();
   }
 
