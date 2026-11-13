@@ -106,8 +106,10 @@
     // back onto it. Reduced motion: a short plain glide.
     var dir = dist > 0 ? 1 : -1;
     var over = reduce ? 0 : dir * Math.min(10.5, Math.max(2.7, Math.abs(dist) * 0.00525));
-    var ms1 = reduce ? 260 : Math.min(1000, 433 + Math.abs(dist) * 0.1667);
-    var ms2 = reduce ? 0 : 320;
+    // (A mouse, i.e. a desktop: the whole move half as fast again: two thirds of the time.)
+    var pace = window.matchMedia('(hover: hover) and (pointer: fine)').matches ? 1 / 1.5 : 1;
+    var ms1 = (reduce ? 260 : Math.min(1000, 433 + Math.abs(dist) * 0.1667)) * pace;
+    var ms2 = (reduce ? 0 : 320) * pace;
     var peak = from + dist + over;
     var t0 = null;
     document.documentElement.style.scrollBehavior = 'auto';
