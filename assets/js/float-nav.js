@@ -152,6 +152,19 @@
     if (!force && window.innerWidth === lastW && Math.abs(vh - lastH) < 2) return;
     lastW = window.innerWidth; lastH = vh;
     IDS.forEach(function (id) { var el = document.getElementById(id); if (el) el.style.paddingTop = base[id] + 'px'; });
+    // Phones: a section's own divider line can show on landing, but what is under it starts
+    // below the screen (no half-shown cards peeking in at the bottom).
+    IDS.forEach(function (id) {
+      var sec = document.getElementById(id);
+      var div = sec && sec.querySelector('[style*="border-top: 1px solid"]');
+      if (!div) return;
+      if (div.dataset.basePad === undefined) div.dataset.basePad = parseFloat(getComputedStyle(div).paddingTop) || 0;
+      var basePad = parseFloat(div.dataset.basePad);
+      div.style.paddingTop = basePad + 'px';
+      if (window.innerWidth > 700) return;
+      var lineAt = OFFSET + (div.getBoundingClientRect().top - labelOf(sec).getBoundingClientRect().top);
+      if (lineAt < vh) div.style.paddingTop = Math.max(basePad, vh + 12 - lineAt) + 'px';
+    });
     for (var i = 1; i < IDS.length; i++) {
       var prev = document.getElementById(IDS[i - 1]), next = document.getElementById(IDS[i]);
       if (!prev || !next) continue;
