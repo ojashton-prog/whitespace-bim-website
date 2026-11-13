@@ -10,7 +10,8 @@ const STYLE = Q.get('style') || 'colour';   // colour | grey
 const W = +(Q.get('w') || 2000), H = +(Q.get('h') || 1250);
 const GREY = STYLE === 'grey';
 const SITE = STYLE === 'site';
-const REAL = STYLE === 'real';
+const REAL = STYLE === 'real' || STYLE === 'realfront';
+const FRONT = STYLE === 'realfront';
 const HILITE = [0x3ba3ec, 0x8fdc8f, 0x2fd13c];
 const REMAP = {
   // equipment / racks -> whites and pale greys
@@ -27,10 +28,10 @@ const REMAP = {
   0x2a2d31:0x6b7280, 0x3a3f45:0x9ca3af, 0x5b6470:0x6b7280, 0x1f4e8c:0x9ca3af, 0x1d2024:0x6b7280, 0x2b2f33:0x374151,
 };
 
-const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true});
+const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true, alpha:true});
 renderer.setPixelRatio(2);
 renderer.setSize(W, H);
-renderer.setClearColor(0xffffff, 1);
+renderer.setClearColor(0xffffff, Q.get('alpha') ? 0 : 1);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
@@ -44,7 +45,7 @@ sun.shadow.mapSize.set(4096, 4096);
 sun.shadow.radius = 6;
 sun.shadow.bias = -0.0005;
 scene.add(sun); scene.add(sun.target);
-if (STYLE === 'real') { scene.children[0].intensity = 0.55; sun.intensity = 1.5; const fill = new THREE.DirectionalLight(0xffffff, 0.35); fill.position.set(40, 20, -10); scene.add(fill); }
+if (REAL) { scene.children[0].intensity = 0.55; sun.intensity = 1.5; const fill = new THREE.DirectionalLight(0xffffff, 0.35); fill.position.set(40, 20, -10); scene.add(fill); }
 
 // ---------- materials ----------
 const matCache = {};
@@ -113,11 +114,12 @@ function cyl(p, axis, r, len, col, o = {}) {
 
 // ---------- pipe with real bends, flanges, hangers ----------
 function pipe(pts, r, col, o = {}) {
-  const R = o.bend || Math.max(r * 2.5, 0.12);
+  const R0 = o.bend || Math.max(r * 2.5, 0.12);
   const path = new THREE.CurvePath();
   let cur = pts[0].clone();
   for (let i = 1; i < pts.length; i++) {
     const P = pts[i];
+    const R = (o.bends && o.bends[i - 1]) || R0;
     if (i < pts.length - 1) {
       const a = P.clone().sub(pts[i-1]).normalize();
       const b = pts[i+1].clone().sub(P).normalize();
@@ -595,7 +597,32 @@ function chillerdeck() {
   return {center: V(L / 2, 3, rows * RS / 2)};
 }
 
-const info = ({hall, chillers, generators, plantfloor, roof, chillerdeck})[SCENE]();
+function logomark() {
+  const cols = [0x3ba3ec, 0xf4a57a, 0x8fdc8f];
+  if (REAL) { scene.children[0].intensity = 0.95; sun.intensity = 0.55; }
+  box(-0.1, -0.22, -0.1, 2.7, 0.22, 2.1, 0x9aa0a6);
+  box(0, 0, 0, 2.5, 1.9, 1.9, 0xe6e8ea);
+  for (let k = 0; k < 6; k++) box(2.5, 0.35 + k * 0.22, 0.2, 0.02, 0.06, 1.5, 0xb3b9bf, {edges: false});
+  box(0.2, 0.25, 1.9, 1.0, 1.4, 0.02, 0xd5d9dd); box(1.3, 0.25, 1.9, 1.0, 1.4, 0.02, 0xd5d9dd);
+  box(1.12, 0.8, 1.92, 0.05, 0.3, 0.03, 0x6b7178, {edges: false});
+  cyl(V(1.25, 1.93, 0.95), 'y', 0.66, 0.06, 0xb3b9bf, {outline: false, seg: 48, edges: true});
+  cyl(V(1.25, 1.97, 0.95), 'y', 0.18, 0.04, 0x6b7178, {outline: false, seg: 32});
+  const r = 0.17, sp = 0.55, zs = [0.4, 0.4 + sp, 0.4 + 2 * sp], X = -2.6, Yb = 3.1, Zend = 5.3, R0 = 0.45;
+  for (let k = 0; k < 3; k++) {
+    const z = zs[k], o = 2 - k, Yk = Yb + o * sp;
+    const pts = [V(0.05, 0.95, z), V(X, 0.95, z), V(X, Yk, z), V(X, Yk, Zend)];
+    pipe(pts, r, cols[k], {bends: [R0, R0 + o * sp], flanges: false});
+    const R2 = R0 + o * sp, F = 0x4b5563;
+    cyl(V(-1.3, 0.95, z), 'x', r * 1.4, 0.06, F, {keep: true});
+    cyl(V(X, (0.95 + R0 + Yk - R2) / 2, z), 'y', r * 1.4, 0.06, F, {keep: true});
+    cyl(V(X, Yk, z + R2 + 0.5), 'z', r * 1.4, 0.06, F, {keep: true});
+    valve(V(X, Yk, Zend - 1.0), 'z', r, 0x4b5563);
+    cyl(V(-0.03, 0.95, z), 'x', r * 1.55, 0.06, 0x4b5563, {keep: true});
+  }
+  return {center: V(-0.3, 1.9, 2.3)};
+}
+
+const info = ({logomark, hall, chillers, generators, plantfloor, roof, chillerdeck})[SCENE]();
 window.INFO = info;
 
 let cam;
@@ -608,7 +635,8 @@ if (info.persp && !Q.get('crop') && !SITE && !REAL) {
 let bb = new THREE.Box3().setFromObject(scene);
 const CROP = Q.get('crop');
 if (CROP) { const c = CROP.split(',').map(Number); bb = new THREE.Box3(V(c[0], c[1], c[2]), V(c[3], c[4], c[5])); info.center = V((c[0]+c[3])/2, (c[1]+c[4])/2, (c[2]+c[5])/2); }
-const dir = (REAL ? V(1, 0.42, 1.35) : V(1, 0.82, 1)).normalize();
+const QD = Q.get('dir') ? Q.get('dir').split(',').map(Number) : null;
+const dir = (QD ? V(QD[0], QD[1], QD[2]) : FRONT ? V(1, 0.34, 0.92) : REAL ? V(1, 0.42, 1.35) : V(1, 0.82, 1)).normalize();
 cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -500, 500);
 cam.position.copy(info.center.clone().addScaledVector(dir, 100));
 cam.up.set(0, 1, 0);
@@ -629,6 +657,8 @@ cam.updateProjectionMatrix();
 const s = sun.shadow.camera; s.left = -70; s.right = 70; s.top = 70; s.bottom = -70; s.near = 1; s.far = 200;
 sun.position.copy(info.center).add(V(-25, 60, 15)); sun.target.position.copy(info.center);
 renderer.render(scene, cam);
+window.BIG = scene.children.filter(o=>{const b=new THREE.Box3().setFromObject(o);return b.max.x-b.min.x>100}).map(o=>o.type+":"+(o.geometry?o.geometry.type:"")+":"+(o.geometry&&o.geometry.parameters?JSON.stringify(o.geometry.parameters).slice(0,120):"")).slice(0,5);
+window.BB = JSON.stringify({min: new THREE.Box3().setFromObject(scene).min, max: new THREE.Box3().setFromObject(scene).max, l: cam.left, r: cam.right, t: cam.top, b: cam.bottom});
 window.DONE = true;
 </script>
 </body></html>
