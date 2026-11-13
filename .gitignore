@@ -1,0 +1,4 @@
+node_modules/
+renders/out3d/
+renders/out/
+.DS_Store
