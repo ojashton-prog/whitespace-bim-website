@@ -18,7 +18,25 @@
   var settleTimer;
 
   function pastHeader() { return nav.getBoundingClientRect().bottom < 0; }
-  function setShown(on) { fnav.classList.toggle('show', on); }
+  // Shown: slides in. Hidden: fades out in place. Auto-hides 2s after scrolling stops,
+  // unless the pointer or keyboard focus is on it.
+  var HIDE_AFTER = 2000;
+  var hideTimer, hovering = false;
+  function armHide() {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () {
+      if (hovering || fnav.contains(document.activeElement)) { armHide(); return; }
+      setShown(false);
+      anchorY = window.scrollY;   // scroll a little again to bring it back
+    }, HIDE_AFTER);
+  }
+  function setShown(on) {
+    fnav.classList.toggle('show', on);
+    if (on) armHide(); else clearTimeout(hideTimer);
+  }
+  fnav.addEventListener('mouseenter', function () { hovering = true; clearTimeout(hideTimer); });
+  fnav.addEventListener('mouseleave', function () { hovering = false; if (fnav.classList.contains('show')) armHide(); });
+  fnav.addEventListener('focusout', function () { if (fnav.classList.contains('show')) armHide(); });
 
   function update() {
     if (jumping) {
