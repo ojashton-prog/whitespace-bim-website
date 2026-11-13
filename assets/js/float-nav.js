@@ -94,7 +94,7 @@
 
   // Our own smooth scroll, the same on every phone and browser (some phones skip the
   // browser's own when animations are turned down): it gathers speed, coasts a little past
-  // the section (up to 35 px) and settles back onto it. A touch or the wheel stops it.
+  // the section (up to 10.5 px) and settles back onto it. A touch or the wheel stops it.
   var glide = null;
   function stopGlide() { if (glide) { cancelAnimationFrame(glide); glide = null; } }
   function glideTo(y) {
@@ -102,12 +102,12 @@
     var from = window.scrollY, dist = y - from;
     if (Math.abs(dist) < 2) { window.scrollTo(0, y); return; }
     var reduce = false; // (the same glide everywhere, as asked; a phone's reduced-motion setting no longer skips it)
-    // With inertia: speeds up to the middle of the move and slows again, a little past the section (up to 35 px), settles
+    // With inertia: speeds up to the middle of the move and slows again, a little past the section (up to 10.5 px), settles
     // back onto it. Reduced motion: a short plain glide.
     var dir = dist > 0 ? 1 : -1;
-    var over = reduce ? 0 : dir * Math.min(35, Math.max(9, Math.abs(dist) * 0.0175));
-    var ms1 = reduce ? 260 : Math.min(1500, 650 + Math.abs(dist) * 0.25);
-    var ms2 = reduce ? 0 : 480;
+    var over = reduce ? 0 : dir * Math.min(10.5, Math.max(2.7, Math.abs(dist) * 0.00525));
+    var ms1 = reduce ? 260 : Math.min(1000, 433 + Math.abs(dist) * 0.1667);
+    var ms2 = reduce ? 0 : 320;
     var peak = from + dist + over;
     var t0 = null;
     document.documentElement.style.scrollBehavior = 'auto';
