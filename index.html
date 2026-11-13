@@ -40,10 +40,10 @@ header nav{position:absolute;top:16px;right:16px;flex-wrap:nowrap!important;gap:
 #contact{min-height:100vh;min-height:100svh;box-sizing:border-box}
 #pipework{overflow-x:clip}
 /* Phones: the logo and the menu 30 % larger than before (Studio of sizes: .9 -> 1.17 logo, 14 -> 18.2 px menu), smaller steps on narrow screens so nothing is cut off. */
-@media (max-width:700px){header .brand{zoom:1.17}header nav{font-size:18.2px!important;gap:14px!important}}
-@media (max-width:400px){header .brand{zoom:1.06}header nav{font-size:16.5px!important;gap:12px!important}}
-@media (max-width:370px){header .brand{zoom:.92}header nav{font-size:15px!important;gap:10px!important}}
-@media (max-width:330px){header .brand{zoom:.84}header nav{font-size:14px!important;gap:9px!important}}
+@media (max-width:700px){header .brand{zoom:1.17}header nav{font-size:18.2px!important;gap:14px!important}.fnav{font-size:18.2px;gap:14px}}
+@media (max-width:400px){header .brand{zoom:1.06}header nav{font-size:16.5px!important;gap:12px!important}.fnav{font-size:16.5px;gap:12px}}
+@media (max-width:370px){header .brand{zoom:.92}header nav{font-size:15px!important;gap:10px!important}.fnav{font-size:15px;gap:10px}}
+@media (max-width:330px){header .brand{zoom:.84}header nav{font-size:14px!important;gap:9px!important}.fnav{font-size:14px;gap:9px;padding:10px 10px}}
 /* Phones: the logo, headline and model fill the first screen; SERVICES starts below it. */
 @media (max-width:700px){.first-screen{min-height:calc(100vh - 56px);min-height:calc(100svh - 56px);display:flex;flex-direction:column}#top h1,#top p{top:-37px!important}.first-screen figure{margin-top:auto!important;margin-bottom:auto!important}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fnav{transition:none}}
