@@ -185,7 +185,9 @@
       if (box) box.style.removeProperty('height');
       foot.style.removeProperty('padding-top');
       var target = labelOf(last).getBoundingClientRect().top + window.scrollY - OFFSET;
-      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      // Phones: size for the screen with the browser bars hidden (as they are once you
+      // have scrolled down), so the last section reaches the same spot as the others.
+      var maxScroll = document.documentElement.scrollHeight - Math.max(window.innerHeight, vh);
       var extra = target - maxScroll;
       // First a little more room between the Send button and the logo, then a taller message box.
       if (extra > 0) {
