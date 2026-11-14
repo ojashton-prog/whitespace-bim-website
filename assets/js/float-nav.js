@@ -146,14 +146,15 @@
     var el = document.getElementById(id);
     if (el) base[id] = parseFloat(getComputedStyle(el).paddingTop) || 0;
   });
-  var lastW = 0, lastH = 0, tallest = 0;
+  var lastW = 0, lastH = 0, lastInner = 0, tallest = 0;
   function fitSections(force) {
-    // The tallest the screen has been at this width (phones: browser bars hidden).
+    // Section spacing uses the tallest the screen has been at this width (phones: bars hidden).
     if (window.innerWidth !== lastW) tallest = 0;
     tallest = Math.max(tallest, window.innerHeight);
     var vh = Math.max(probe.offsetHeight || 0, tallest);
-    if (!force && window.innerWidth === lastW && Math.abs(vh - lastH) < 2) return;
-    lastW = window.innerWidth; lastH = vh;
+    // Re-fit whenever the visible height changes too (phone browser bars showing or hiding).
+    if (!force && window.innerWidth === lastW && Math.abs(vh - lastH) < 2 && Math.abs(window.innerHeight - lastInner) < 2) return;
+    lastW = window.innerWidth; lastH = vh; lastInner = window.innerHeight;
     IDS.forEach(function (id) { var el = document.getElementById(id); if (el) el.style.paddingTop = base[id] + 'px'; });
     // Extra room goes above a section's divider line, so the line stays close to its heading.
     function spacerOf(sec) {
@@ -188,9 +189,9 @@
       if (box) box.style.removeProperty('height');
       foot.style.removeProperty('padding-top');
       var target = labelOf(last).getBoundingClientRect().top + window.scrollY - OFFSET;
-      // Phones: size for the screen with the browser bars hidden (as they are once you
-      // have scrolled down), so the last section reaches the same spot as the others.
-      var maxScroll = document.documentElement.scrollHeight - Math.max(window.innerHeight, vh);
+      // Fit the visible screen as it is now; this re-runs when phone browser bars show or hide,
+      // so the logo always ends just above the bottom of what you can see.
+      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       var extra = target - maxScroll;
       // First a little more room between the Send button and the logo, then a taller message box.
       if (extra > 0) {
