@@ -146,9 +146,12 @@
     var el = document.getElementById(id);
     if (el) base[id] = parseFloat(getComputedStyle(el).paddingTop) || 0;
   });
-  var lastW = 0, lastH = 0;
+  var lastW = 0, lastH = 0, tallest = 0;
   function fitSections(force) {
-    var vh = probe.offsetHeight || window.innerHeight;
+    // The tallest the screen has been at this width (phones: browser bars hidden).
+    if (window.innerWidth !== lastW) tallest = 0;
+    tallest = Math.max(tallest, window.innerHeight);
+    var vh = Math.max(probe.offsetHeight || 0, tallest);
     if (!force && window.innerWidth === lastW && Math.abs(vh - lastH) < 2) return;
     lastW = window.innerWidth; lastH = vh;
     IDS.forEach(function (id) { var el = document.getElementById(id); if (el) el.style.paddingTop = base[id] + 'px'; });
