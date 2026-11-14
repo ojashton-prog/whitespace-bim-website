@@ -152,12 +152,27 @@
     if (!force && window.innerWidth === lastW && Math.abs(vh - lastH) < 2) return;
     lastW = window.innerWidth; lastH = vh;
     IDS.forEach(function (id) { var el = document.getElementById(id); if (el) el.style.paddingTop = base[id] + 'px'; });
+    // Extra room goes above a section's divider line, so the line stays close to its heading.
+    function spacerOf(sec) {
+      var d = sec.previousElementSibling;
+      return d && (d.getAttribute('aria-hidden') === 'true' || d.id === 'rule') ? d : sec;
+    }
+    IDS.forEach(function (id) {
+      var sec = document.getElementById(id); if (!sec) return;
+      var sp = spacerOf(sec); if (sp === sec) return;
+      if (sp.dataset.basePad === undefined) sp.dataset.basePad = parseFloat(getComputedStyle(sp).paddingTop) || 0;
+      sp.style.paddingTop = sp.dataset.basePad + 'px';
+    });
     for (var i = 1; i < IDS.length; i++) {
       var prev = document.getElementById(IDS[i - 1]), next = document.getElementById(IDS[i]);
       if (!prev || !next) continue;
       var gap = labelOf(next).getBoundingClientRect().top - labelOf(prev).getBoundingClientRect().top;
       var need = vh - OFFSET + 24;
-      if (gap < need) next.style.paddingTop = (base[IDS[i]] + need - gap) + 'px';
+      if (gap < need) {
+        var sp = spacerOf(next);
+        if (sp === next) next.style.paddingTop = (base[IDS[i]] + need - gap) + 'px';
+        else sp.style.paddingTop = (parseFloat(sp.dataset.basePad) + need - gap) + 'px';
+      }
     }
     // Make sure the page is long enough for the last section to reach the same spot.
     // (The room goes below the footer, so the logo keeps its place under the form.)
