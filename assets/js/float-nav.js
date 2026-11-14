@@ -175,14 +175,23 @@
       }
     }
     // Make sure the page is long enough for the last section to reach the same spot.
-    // (The room goes below the footer, so the logo keeps its place under the form.)
+    // The spare room goes into the message box first, so the logo ends at the bottom
+    // of the screen; anything beyond a sensible box size goes below the footer.
     var last = document.getElementById(IDS[IDS.length - 1]);
     var foot = document.querySelector('footer');
+    var box = last && last.querySelector('textarea');
     if (last && foot) {
       foot.style.marginBottom = '';
+      if (box) box.style.removeProperty('height');
       var target = labelOf(last).getBoundingClientRect().top + window.scrollY - OFFSET;
       var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (target > maxScroll) foot.style.marginBottom = (target - maxScroll + 2) + 'px';
+      var extra = target - maxScroll;
+      if (extra > 0 && box) {
+        var grow = Math.min(extra, 280);
+        box.style.setProperty('height', (box.getBoundingClientRect().height + grow) + 'px', 'important');
+        extra -= grow;
+      }
+      if (extra > 0) foot.style.marginBottom = (extra + 2) + 'px';
     }
   }
   fitSections(true);
