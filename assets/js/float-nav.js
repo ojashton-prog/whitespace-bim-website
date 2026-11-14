@@ -182,12 +182,21 @@
     var box = last && last.querySelector('textarea');
     if (last && foot) {
       foot.style.marginBottom = '';
+      var btnRow = last.querySelector('form button');
+      btnRow = btnRow && btnRow.parentElement;
       if (box) box.style.removeProperty('height');
+      if (btnRow) btnRow.style.marginTop = '';
       var target = labelOf(last).getBoundingClientRect().top + window.scrollY - OFFSET;
       var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       var extra = target - maxScroll;
+      // First some breathing room above the Send button, then a taller message box.
+      if (extra > 0 && btnRow) {
+        var gap = Math.min(extra, 40);
+        btnRow.style.marginTop = gap + 'px';
+        extra -= gap;
+      }
       if (extra > 0 && box) {
-        var grow = Math.min(extra, 280);
+        var grow = Math.min(extra, 200);
         box.style.setProperty('height', (box.getBoundingClientRect().height + grow) + 'px', 'important');
         extra -= grow;
       }
